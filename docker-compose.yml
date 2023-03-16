@@ -11,19 +11,19 @@ services:
       - "traefik.docker.network=web"
       - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
-      - "traefik.http.services.html_classroom_monitor.loadbalancer.server.port=80"
-      - "traefik.http.routers.html_classroom_monitor.rule=Host(`html.bf0.ch`)"
-      - "traefik.http.routers.html_classroom_monitor.entrypoints=web"
-      - "traefik.http.routers.html_classroom_monitor.middlewares=https_redirect"
-      - "traefik.http.routers.html_classroom_monitor_secured.rule=Host(`html.bf0.ch`)"
-      - "traefik.http.routers.html_classroom_monitor_secured.entrypoints=websecure"
-      - "traefik.http.routers.html_classroom_monitor_secured.tls=true"
-      - "traefik.http.routers.html_classroom_monitor_secured.tls.certresolver=myresolver"
+      - "traefik.http.services.codelabs_progress.loadbalancer.server.port=80"
+      - "traefik.http.routers.codelabs_progress.rule=Host(`codelabs.bf0.ch`)"
+      - "traefik.http.routers.codelabs_progress.entrypoints=web"
+      - "traefik.http.routers.codelabs_progress.middlewares=https_redirect"
+      - "traefik.http.routers.codelabs_progress_secured.rule=Host(`codelabs.bf0.ch`)"
+      - "traefik.http.routers.codelabs_progress_secured.entrypoints=websecure"
+      - "traefik.http.routers.codelabs_progress_secured.tls=true"
+      - "traefik.http.routers.codelabs_progress_secured.tls.certresolver=myresolver"
     networks:
       - web
       - default
   db:
-    image: postgres:9.6
+    image: postgres:15
     env_file: .env
     volumes:
       - db-data:/var/lib/postgresql/data
