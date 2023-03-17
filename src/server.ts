@@ -1,6 +1,5 @@
 import bodyParser from "body-parser";
 import express from "express";
-import Sequelize from "sequelize";
 import cors from "cors";
 import fs from "fs-extra";
 import multer from "multer";
@@ -18,7 +17,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
-import { dbReady, Submission } from "./db";
+import { dbReady, Submission, Course } from "./db";
 import User from "./User";
 
 const urlencodeParser = bodyParser.urlencoded({ extended: false });
@@ -53,9 +52,15 @@ app.post(
   urlencodeParser,
   (req: express.Request, res: express.Response) => {
     res.send(
-      `<script>window.opener.postMessage('${
-        req.body.jwt
-      }');window.close();</script>`
+      `<script>
+if(window.opener) {
+  window.opener.postMessage('${req.body.jwt}');
+  window.close();
+} else {
+  localStorage.setItem('CODELABS_PROGRESS_JWT', '${req.body.jwt}');
+  window.location='/';
+}
+</script>`
     );
   }
 );
@@ -116,17 +121,81 @@ app.patch(
   }
 );
 
+app.delete(
+  "/api/submission",
+  ensureUser,
+  (req: express.Request, res: express.Response) => {
+    if (!req.user.isAdmin) {
+      res.json({});
+      return;
+    }
+    Submission.findOne({
+      where: {
+        assignment: req.body.assignment,
+        email: req.body.email,
+      }
+    }).then((submission) => {
+      return submission.destroy();
+    })
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch((e) => {
+      console.log("upsert error", e);
+      res.sendStatus(500);
+    });
+  }
+);
+
 app.post(
   "/api/submit",
   ensureUser,
   upload.single('file'),
   (req: express.Request, res: express.Response) => {
+    // TODO: disallow upsert if already accepted?
     Submission.upsert({
       assignment: req.query.assignment,
       email: req.user.email,
       state: "submitted",
     }).then((submission) => {
       res.json(submission[0]);
+    }).catch((e) => {
+      console.log("upsert error", e);
+      res.sendStatus(500);
+    });
+  }
+);
+
+app.get(
+  "/api/courses",
+  ensureUser,
+  (req: express.Request, res: express.Response) => {
+    if (!req.user.isAdmin) {
+      res.json([]);
+      return;
+    }
+    const query: any = {
+      where: {}
+    };
+    Course.findAll(query).then(course => {
+      res.json(course);
+    }, (e) => {
+      console.log("query error", e);
+      res.sendStatus(500);
+    });
+  }
+);
+
+app.post(
+  "/api/course",
+  ensureUser,
+  (req: express.Request, res: express.Response) => {
+    if (!req.user.isAdmin) {
+      res.json({});
+      return;
+    }
+    Course.upsert(req.body).then((course) => {
+      res.json(course[0]);
     }).catch((e) => {
       console.log("upsert error", e);
       res.sendStatus(500);

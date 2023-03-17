@@ -15,6 +15,48 @@
 
   <body>
     <div id="app">
+      <ul>
+        <li v-for="c in courses" :key="c.name">
+          <button @click="editCourse(c)">{{c.name}}</button>
+        </li>
+      </ul>
+      <div>
+        <input v-model="courseEdit.name" />
+        <textarea v-model="courseEdit.assignments"></textarea>
+        <textarea v-model="courseEdit.students"></textarea>
+        <button @click="saveCourse">Save</button>
+      </div>
+
+      <div v-for="(c, cindex) in courses" :key="c.name">
+        {{c.name}}
+        <table>
+          <thead>
+            <tr>
+              <th>Students</th>
+              <th>Totals</th>
+              <th v-for="a in c.assignments">{{ a }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(s, sindex) in c.students">
+              <td>{{ s }}</td>
+              <td>{{ studentsTotal[cindex][sindex] }}</td>
+              <th v-for="a in c.assignments">{{ submissionsIndex[a] && submissionsIndex[a][s] }}</th>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>{{ c.students.length }}</td>
+              <td></td>
+              <th v-for="(a, aindex) in c.assignments">
+                {{ assignmentsTotal[cindex][aindex] }}
+              </th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+
       <table class="submissions">
         <thead>
           <tr>
@@ -29,16 +71,20 @@
             <td>{{s.assignment}}</td>
             <td>{{s.email}}</td>
             <td>
-                <span v-if="s.state ==='submitted'">
-                    <button @click="changeState(s, 'accepted')">accept</button>
-                    <button @click="changeState(s, 'rejected')">reject</button>
-                </span>
-                <select v-else :value="s.state" @input="changeState(s, $event.target.value)">
-                    <option>submitted</option>
-                    <option>accepted</option>
-                    <option>rejected</option>
-                </select>
-                <button>delete</button>
+              <span v-if="s.state ==='submitted'">
+                <button @click="changeState(s, 'accepted')">accept</button>
+                <button @click="changeState(s, 'rejected')">reject</button>
+              </span>
+              <select
+                v-else
+                :value="s.state"
+                @input="changeState(s, $event.target.value)"
+              >
+                <option>submitted</option>
+                <option>accepted</option>
+                <option>rejected</option>
+              </select>
+              <button @click="deleteSubmission(s)">delete</button>
             </td>
             <td>
               <img :src="`/codelabs/${s.assignment}/${s.email}.jpg`" />

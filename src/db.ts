@@ -1,4 +1,4 @@
-import { SubmissionModelStatic } from "db";
+import { SubmissionModelStatic, CourseModelStatic } from "db";
 import { DataTypes, Sequelize } from "sequelize";
 
 export const sequelize = new Sequelize({
@@ -23,6 +23,15 @@ export const Submission = sequelize.define(
     indexes: [],
   }
 ) as SubmissionModelStatic;
+
+export const Course = sequelize.define(
+  "course",
+  {
+    name: { type: DataTypes.STRING, primaryKey: true },
+    students: { type: DataTypes.JSON, allowNull: false },
+    assignments: {  type: DataTypes.JSON, allowNull: false },
+  }
+) as CourseModelStatic;
 
 function ensureConnection(): Promise<any> {
   return new Promise((resolve, reject) => {
