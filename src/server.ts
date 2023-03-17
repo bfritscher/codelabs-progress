@@ -99,6 +99,23 @@ app.get(
   }
 );
 
+app.patch(
+  "/api/submission",
+  ensureUser,
+  (req: express.Request, res: express.Response) => {
+    if (!req.user.isAdmin) {
+      res.json({});
+      return;
+    }
+    Submission.upsert(req.body).then((submission) => {
+      res.json(submission[0]);
+    }).catch((e) => {
+      console.log("upsert error", e);
+      res.sendStatus(500);
+    });
+  }
+);
+
 app.post(
   "/api/submit",
   ensureUser,
@@ -109,7 +126,7 @@ app.post(
       email: req.user.email,
       state: "submitted",
     }).then((submission) => {
-      res.json(submission);
+      res.json(submission[0]);
     }).catch((e) => {
       console.log("upsert error", e);
       res.sendStatus(500);

@@ -6,7 +6,7 @@ createApp({
   setup() {
     const JWT_KEY = "CODELABS_PROGRESS_JWT";
     const jwt = localStorage.getItem(JWT_KEY);
-    
+
     const submissions = ref([]);
 
     function init() {
@@ -23,7 +23,7 @@ createApp({
     }
 
     function getSubmissions() {
-      fetch("api/submissions", {
+      fetch("/api/submissions", {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -44,6 +44,21 @@ createApp({
     init();
     return {
       submissions,
+      changeState(submission, state) {
+        fetch(`/api/submission`, {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({ ...submission, state }),
+        }).then((response) => {
+          return response.json();
+        }).then(newSubmission => {
+          Object.assign(submission, newSubmission)
+        })
+      },
     };
   },
 }).mount("#app");

@@ -22,6 +22,11 @@ const currentScript = document.currentScript;
   dropzoneDiv.classList.add("dropzone");
   mainDiv.append(dropzoneDiv);
   let dropzone = null;
+  assignmentDiv.addEventListener("click", () => {
+    if (canUpload) {
+      dropzoneDiv.click();
+    }
+  });
 
   const scriptDropzone = document.createElement("script");
   scriptDropzone.src = "https://unpkg.com/dropzone@5/dist/min/dropzone.min.js";
@@ -39,7 +44,7 @@ const currentScript = document.currentScript;
         this.removeFile(this.files[0]);
     });
     dropzone.on("success", function (file, response) {
-      console.log(file, response);
+      renderSubmission(response);
     });
     document.onpaste = function (event) {
       const items = (event.clipboardData || event.originalEvent.clipboardData)
@@ -106,7 +111,7 @@ const currentScript = document.currentScript;
     loginButton.style.display = "none";
     if (submission) {
       // display
-      assignmentDiv.innerHTML = `<h4>Your submission is <span class="submission-state ${submission.state}">${submission.state}</span>:</h4><img style="max-width:100%;" src="${BASE_URL}/codelabs/${getAssignment()}/${submission.email}.jpg"/>`;
+      assignmentDiv.innerHTML = `<h4>Your submission is <span class="submission-state ${submission.state}">${submission.state}</span>:</h4><img style="max-width:100%;" src="${BASE_URL}/codelabs/${getAssignment()}/${submission.email}.jpg?${Math.random()}"/>`;
     }
     if (
       !submission ||

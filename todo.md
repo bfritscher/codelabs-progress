@@ -19,7 +19,7 @@
 [x] list all
 [ ] filter
 [ ] classlist %
-[ ] validate reject or accept
+[x] validate reject or accept
 [ ] delete submission
 [ ] delete all submissions
 [ ] group by assignment ids

@@ -28,7 +28,18 @@
           <tr v-for="s in submissions" :key="`${s.email}_${s.assignment}`">
             <td>{{s.assignment}}</td>
             <td>{{s.email}}</td>
-            <td>{{s.state}}</td>
+            <td>
+                <span v-if="s.state ==='submitted'">
+                    <button @click="changeState(s, 'accepted')">accept</button>
+                    <button @click="changeState(s, 'rejected')">reject</button>
+                </span>
+                <select v-else :value="s.state" @input="changeState(s, $event.target.value)">
+                    <option>submitted</option>
+                    <option>accepted</option>
+                    <option>rejected</option>
+                </select>
+                <button>delete</button>
+            </td>
             <td>
               <img :src="`/codelabs/${s.assignment}/${s.email}.jpg`" />
             </td>
