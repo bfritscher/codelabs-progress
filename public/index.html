@@ -1,96 +1,40 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>HTML Monitor</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
-    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
-    <script src="main.js"></script>
-</head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Codelabs Progress</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+    />
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js" type="module"></script>
+  </head>
 
-<body>
-    <header class="navbar">
-        <section class="navbar-section p-2">
-            <a href="#" class="navbar-brand mr-2">Classroom HTML Monitor</a>
-        </section>
-        <section class="navbar-section">
-            <div id="user" class="p-2"></div>
-        </section>
-    </header>
-    <div class="container">
-        <div class="columns">
-            <div class="column col-8 col-mx-auto">
-                <div class="assignment-hide my-2">
-                    <div class="empty">
-                        <div class="empty-icon">
-                            <i class="icon icon-people"></i>
-                        </div>
-                        <p class="empty-title h5">Set an assignments</p>
-                        <div class="empty-action">
-                            <div class="input-group">
-                                <input class="form-input input-lg" id="assignment-input" type="text" placeholder="assignment name">
-                                <button class="btn btn-primary input-group-btn btn-lg" onclick="setAssignment(document.getElementById('assignment-input').value)">Set</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="assignment-show">
-                    <h2>Assignment <span id="assignment"></span></h2>
-                    <div id="toast-success" class="toast toast-success">
-                        URL submitted successfully!
-                    </div>
-                    <div id="toast-error" class="toast toast-error">
-                        
-                    </div>
-                    <div class="form-group admin-hide">
-                        <label class="form-label" for="input-url-1">URL</label>
-                        <div class="input-group">
-                            <input class="form-input input-lg" id="url" type="url" placeholder="https://monsite">
-                            <button id="send" class="btn btn-primary input-group-btn btn-lg" onclick="submitForm()">Send</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group admin-show">
-                        <label class="form-label admin-show">Batch upload
-                            <textarea class="form-input" id="batch" placeholder="email,url" rows="3"></textarea></label>
-                    </div>
-                    <div class="form-group text-right admin-show">
-                        <button class="btn btn-primary btn-lg" onclick="submitForm()">Send</button>
-                    </div>
-                </div>
-                <h2>Submissions</h2>
-                <div id="submissions-chart" class="admin-show ct-chart ct-major-eleventh"></div>
-                <div id="submissions">
-                </div>
-            </div>
-        </div>
+  <body>
+    <div id="app">
+      <table class="submissions">
+        <thead>
+          <tr>
+            <th>Assignment</th>
+            <th>E-mail</th>
+            <th>State</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="s in submissions" :key="`${s.email}_${s.assignment}`">
+            <td>{{s.assignment}}</td>
+            <td>{{s.email}}</td>
+            <td>{{s.state}}</td>
+            <td>
+              <img :src="`/codelabs/${s.assignment}/${s.email}.jpg`" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="modal" id="processing" >
-        <div class="modal-overlay" ></div>
-        <div class="modal-container" style="text-align: center">
-          <div class="modal-header">
-            <div class="modal-title h5">Processing</div>
-          </div>
-          <div class="modal-body">
-            <div class="content">
-                    <img src="bars.svg">
-            </div>
-          </div>
-        </div>
-      </div>
-    <template id="submission-template">
-        <div class="submission">
-            <h3 class="title"></h3>
-            <h4 class="status"></h4>
-            <img class="preview">
-            <ul class="testResults"></ul>
-        </div>
-    </template>
-</body>
-
+  </body>
 </html>

@@ -1,28 +1,25 @@
 import bodyParser from "body-parser";
 import express from "express";
-import pg from "pg";
 import Sequelize from "sequelize";
-import fs from "fs";
+import cors from "cors";
+import fs from "fs-extra";
+import multer from "multer";
+const storage = multer.diskStorage({
+  async destination(req, file, cb) {
+    const dir = `/app/public/codelabs/${req.query.assignment}`
+    await fs.ensureDir(dir);
+    // use assingment for folder
+    cb(null, dir)
+  },
+  filename(req, file, cb) {
+    cb(null, `${req.user.email}.jpg`)
+  }
+})
+
+const upload = multer({ storage })
 
 import { dbReady, Submission } from "./db";
-
 import User from "./User";
-import { starTest } from "./validation";
-
-
-pg.defaults.parseInt8 = true
-
-const assignmentsFolder = './assignments_tests/';
-
-const availableAssignments = [];
-const fileRegex = /(.*)\.js/;
-fs.readdirSync(assignmentsFolder).forEach(file => {
-  const match = file.match(fileRegex);
-  if (match) {
-    availableAssignments.push(match[1]);
-  }
-});
-console.log('available assignments', availableAssignments);
 
 const urlencodeParser = bodyParser.urlencoded({ extended: false });
 
@@ -32,15 +29,20 @@ async function ensureUser(
   next: express.NextFunction
 ) {
   try {
-    req.user = await User.fromToken(req.body.jwt);
-    next();
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      const token = req.headers.authorization.split(' ')[1];
+      req.user = await User.fromToken(token);
+      next();
+    } else {
+      throw new Error("No Bearer Token found");
+    }
   } catch (e) {
-    console.log(e);
     res.sendStatus(403);
   }
 }
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
@@ -51,39 +53,43 @@ app.post(
   urlencodeParser,
   (req: express.Request, res: express.Response) => {
     res.send(
-      `<script>localStorage.setItem('jwt', '${
+      `<script>window.opener.postMessage('${
         req.body.jwt
-      }');window.location='/';</script>`
+      }');window.close();</script>`
     );
   }
 );
 
-app.post(
-  "/api/verify_token",
-  ensureUser,
-  (req: express.Request, res: express.Response) => {
-    res.json(req.user);
-  }
-);
-
-app.post(
-  "/api/submissions",
+app.get(
+  "/api/submission",
   ensureUser,
   (req: express.Request, res: express.Response) => {
     const query: any = {
       where: {}
     };
+    query.where.email = req.user.email;
+    query.where.assignment = req.query.assignment;
+    Submission.findOne(query).then(submission => {
+      res.json(submission);
+    }, (e) => {
+      console.log("query error", e);
+      res.sendStatus(500);
+    });
+  }
+);
+
+
+app.get(
+  "/api/submissions",
+  ensureUser,
+  (req: express.Request, res: express.Response) => {
     if (!req.user.isAdmin) {
-      query.where.email = req.user.email;
+      res.json([]);
+      return;
     }
-    if (req.body.assignment) {
-      query.where.assignment = req.body.assignment;
-    }
-    if (req.user.isAdmin && !req.body.assignment) {
-      query.group = "assignment";
-      query.attributes = ["assignment",
-        [Sequelize.fn('COUNT', Sequelize.col('*')), 'nb']];
-    }
+    const query: any = {
+      where: {}
+    };
     Submission.findAll(query).then(submissions => {
       res.json(submissions);
     }, (e) => {
@@ -96,70 +102,22 @@ app.post(
 app.post(
   "/api/submit",
   ensureUser,
+  upload.single('file'),
   (req: express.Request, res: express.Response) => {
-    if (req.user.isAdmin && req.body.batch.length > 0) {
-      req.body.batch.split("\n").forEach((entry: string) => {
-        const [email, url] = entry.split(",");
-        const assignment = req.body.assignment;
-        const data = {
-          assignment,
-          email,
-          url
-        };
-        Submission.upsert(data).then(
-          () => {
-            starTest(data);
-          },
-          () => {
-            // TODO: handle unique constraints
-          }
-        );
-      });
-      res.sendStatus(200);
-    } else {
-      if (availableAssignments.indexOf(req.body.assignment) === -1) {
-        res.sendStatus(404);
-        return;
-      }
-      const data = {
-        assignment: req.body.assignment,
-        email: req.user.email,
-        url: req.body.url
-      };
-      const instance = Submission.build(data);
-      instance
-        .validate()
-        .then(() => {
-          return Submission.upsert(data).then(async created => {
-            await starTest(data);
-            res.sendStatus(200);
-          });
-        })
-        .catch(() => {
-          res.sendStatus(500);
-        });
-    }
+    Submission.upsert({
+      assignment: req.query.assignment,
+      email: req.user.email,
+      state: "submitted",
+    }).then((submission) => {
+      res.json(submission);
+    }).catch((e) => {
+      console.log("upsert error", e);
+      res.sendStatus(500);
+    });
   }
 );
-
-/*
-TODO: force update all of assignment if admin
-*/
-
-app.post("/api/update", (req: express.Request, res: express.Response) => {
-  /*
-    req.body.jwt
-    if user.isAdmin && req.body.assignment
-        if req.body.user
-            // update this
-        else
-         // update all
-    else
-        update this
-    */
-});
 
 dbReady.then(() => {
   console.log("sequelize synced");
 });
-app.listen(80, () => console.log("app listening on port 80!"));
+app.listen(8080, () => console.log("app listening on port 8080!"));

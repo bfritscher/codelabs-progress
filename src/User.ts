@@ -13,7 +13,7 @@ export default class User {
         user.email = decoded.email || 'unknown';
         user.firstname = decoded.firstname || 'unknown';
         user.lastname = decoded.lastname || 'unknown';
-        user.isAdmin = admins.indexOf(user.email) > -1;
+        user.isAdmin = admins.includes(user.email);
 
         resolve(user);
       });
