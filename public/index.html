@@ -6,92 +6,164 @@
     <title>Codelabs Progress</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
+      href="//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic"
       rel="stylesheet"
-      href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+      type="text/css"
     />
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js"></script>
     <script src="main.js" type="module"></script>
   </head>
 
   <body>
     <div id="app">
-      <ul>
-        <li v-for="c in courses" :key="c.name">
-          <button @click="editCourse(c)">{{c.name}}</button>
-        </li>
-      </ul>
-      <div>
-        <input v-model="courseEdit.name" />
-        <textarea v-model="courseEdit.assignments"></textarea>
-        <textarea v-model="courseEdit.students"></textarea>
-        <button @click="saveCourse">Save</button>
+      <header>
+        <nav>
+          <h1>Codelabs Progress Dashboard</h1>
+          <span class="spacer"></span>
+        </nav>
+      </header>
+      <div class="submenu">
+        <select
+          :value="selectedCourse.name"
+          @input="handleCourseSelect($event.target.value)"
+        >
+          <option v-for="c in courses" :key="c.name" :value="c.name">
+            {{c.name}}
+          </option>
+          <option value="add_new">add new</option>
+        </select>
+        <button @click="editCourse(selectedCourse)" class="btn-sm">Edit</button>
+      </div>
+      <div class="box" v-if="showCourseEdit">
+        <h2>{{courseEdit.name}}</h2>
+        <p>
+          <label>
+            Assignments:
+            <textarea v-model="courseEdit.assignments" class="btn-block" rows="10"></textarea>
+          </label>
+        </p>
+        <p>
+          Students:
+          <textarea v-model="courseEdit.students" class="btn-block" rows="10"></textarea>
+        </p>
+        <div class="flex">
+          <button @click="deleteCourse">Delete</button>
+          <span class="spacer"></span>
+          <button @click="showCourseEdit=false" class="mx-1">Cancel</button>
+          <button @click="saveCourse">Save</button>
+        </div>
       </div>
 
-      <div v-for="(c, cindex) in courses" :key="c.name">
-        {{c.name}}
+      <div class="overflow">
         <table>
           <thead>
             <tr>
               <th>Students</th>
               <th>Totals</th>
-              <th v-for="a in c.assignments">{{ a }}</th>
+              <th
+                v-for="a in selectedCourse.assignments"
+                @click="selectedAssignment === a ? selectedAssignment = null : selectedAssignment = a"
+              >
+                {{ a }}
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(s, sindex) in c.students">
-              <td>{{ s }}</td>
-              <td>{{ studentsTotal[cindex][sindex] }}</td>
-              <th v-for="a in c.assignments">{{ submissionsIndex[a] && submissionsIndex[a][s] }}</th>
+            <tr v-for="(s, sindex) in selectedCourse.students">
+              <td class="text-nowrap">{{ s }}</td>
+              <td><my-totals :value="studentsTotal[sindex]"></my-totals></td>
+              <td v-for="a in selectedCourse.assignments">
+                <div
+                  v-if="submissionsIndex[a] && submissionsIndex[a][s]"
+                  @click="scrollTo(a, s)"
+                >
+                  <span
+                    :class="submissionsIndex[a][s].state"
+                    :title="`CreatedAt: ${submissionsIndex[a][s].createdAt}\nUpdatedAt: ${submissionsIndex[a][s].updatedAt}`"
+                  >
+                    {{ submissionsIndex[a][s].state }}
+                  </span>
+                </div>
+              </td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <td>{{ c.students.length }}</td>
+              <th>{{ selectedCourse.students.length }}</th>
               <td></td>
-              <th v-for="(a, aindex) in c.assignments">
-                {{ assignmentsTotal[cindex][aindex] }}
+              <th v-for="(a, aindex) in selectedCourse.assignments">
+                <my-totals :value="assignmentsTotal[aindex]"></my-totals>
               </th>
             </tr>
           </tfoot>
         </table>
       </div>
 
-
-      <table class="submissions">
-        <thead>
-          <tr>
-            <th>Assignment</th>
-            <th>E-mail</th>
-            <th>State</th>
-            <th>Image</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="s in submissions" :key="`${s.email}_${s.assignment}`">
-            <td>{{s.assignment}}</td>
-            <td>{{s.email}}</td>
-            <td>
-              <span v-if="s.state ==='submitted'">
-                <button @click="changeState(s, 'accepted')">accept</button>
-                <button @click="changeState(s, 'rejected')">reject</button>
-              </span>
-              <select
-                v-else
-                :value="s.state"
-                @input="changeState(s, $event.target.value)"
-              >
-                <option>submitted</option>
-                <option>accepted</option>
-                <option>rejected</option>
-              </select>
-              <button @click="deleteSubmission(s)">delete</button>
-            </td>
-            <td>
-              <img :src="`/codelabs/${s.assignment}/${s.email}.jpg`" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-if="selectedAssignment">
+        <div class="submenu">
+          <h2>{{selectedAssignment}}</h2>
+          <select v-model="filterState">
+            <option value="">All</option>
+            <option value="submitted">Submitted</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <table class="submissions">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>State</th>
+              <th>Image</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="s in filteredSubmissions"
+              :key="`${s.email}_${s.assignment}`"
+            >
+              <td :id="s.email.replace(/[\W_]+/g,'')" class="text-nowrap">
+                {{s.email}}
+              </td>
+              <td>
+                <span v-if="s.state ==='submitted'">
+                  <button
+                    @click="changeState(s, 'accepted')"
+                    class="bg-accepted btn-block my-1"
+                  >
+                    accept
+                  </button>
+                  <button
+                    @click="changeState(s, 'rejected')"
+                    class="bg-rejected btn-block my-1"
+                  >
+                    reject
+                  </button>
+                </span>
+                <select
+                  v-else
+                  :value="s.state"
+                  @input="changeState(s, $event.target.value)"
+                >
+                  <option>submitted</option>
+                  <option>accepted</option>
+                  <option>rejected</option>
+                </select>
+                <button @click="deleteSubmission(s)" class="btn-block my-1">
+                  delete
+                </button>
+              </td>
+              <td>
+                <img
+                  :src="`/codelabs/${s.assignment}/${s.email}.jpg`"
+                  @click="zoom($event.target)"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </body>
 </html>

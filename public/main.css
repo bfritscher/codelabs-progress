@@ -1,7 +1,170 @@
 body {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: Lato, sans-serif;
+    color: #4c5773;
+    font-size: 14px;
+    margin: 0;
+}
+
+.overflow {
+    overflow: auto;
+}
+
+h1 {
+    margin: 4px 8px 0 8px;
+    font-size: 16px;
+}
+
+h2 {
+    margin: 4px 4px;
+}
+
+nav {
+    display: flex;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+a {
+    text-decoration: none;
+    color: #509ee3;
 }
 
 .submissions img {
     max-width: 100%;
+}
+
+
+table {
+    border-collapse: collapse;
+}
+
+tbody tr:hover {
+    background-color: #ffffcc;
+}
+
+th {
+    color: #509ee3;
+    border-top: 1px solid #eeecec;
+    padding: 0 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+th:hover {
+    background-color: #509ee3;
+    color: white;
+}
+
+tbody td {
+    border: 1px solid #eeecec;
+    padding: 0 8px;
+}
+
+.correct,
+.correct a,
+.accepted {
+    color: rgb(52, 158, 52);
+}
+
+.bg-accepted {
+    background-color: rgb(52, 158, 52);
+}
+
+.wrong,
+.wrong a,
+.rejected {
+    color: rgb(250, 133, 133);
+}
+
+.bg-rejected {
+    background-color: rgb(250, 133, 133);
+}
+
+.warn,
+.warn a,
+.submitted {
+    color: rgb(244, 174, 95);
+}
+
+.absent {
+    color: rgb(200, 200, 200);
+}
+
+.error {
+    background-color: rgba(247, 196, 196, 0.2);
+}
+
+.box {
+    border: 1px solid rgb(243 242 241);
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: rgb(0 0 0 / 10%) 0px 4px 12px;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+button,
+.btn {
+    color: #ffffff;
+    background: #509ee3;
+    border: 1px solid #509ee3;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    display: inline-block;
+    box-sizing: border-box;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-sm {
+    padding: 0.2em;
+    font-size: 0.875em;
+    border-radius: 0.2rem;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.submenu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    background-color: #f5f9fc;
+    padding: 4px;
+    align-items: center;
+}
+.submenu select {
+    font-size: 1.1em;
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.my-1 {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.mx-1 {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.flex {
+    display: flex;
+}
+
+.spacer {
+    flex-grow: 1;
 }

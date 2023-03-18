@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Codelabs Progress Embed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="//fonts.googleapis.com/css?family=Roboto:400,300,400italic,500,700"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Roboto", sans-serif;
+        font-size: 14px;
+        height: 315px;
+      }
+      .codelabs-progress {
+        padding: 0.5em 1em;
+        background: #e8f0fe;
+        border-left: 4px solid #185abc;
+        border-radius: 4px;
+        color: #3c4043;
+        height: 100%;
+      }
+      h2 {
+        margin: 0 0 1em 0;
+      }
+      .btn-login {
+        border-color: #fff;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        cursor: pointer;
+        line-height: 24px;
+        padding-bottom: 6px;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-top: 6px;
+        pointer-events: initial;
+        text-transform: none;
+        color: #fff;
+        background: #1a73e8;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+          0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        text-decoration: none;
+        -webkit-font-smoothing: antialiased;
+      }
+      img.preview {
+        max-width: 100%;
+        max-height: 120px;
+      }
+      .submission-state {
+        font-weight: bold;
+      }
+      .submission-state.accepted {
+        color: #1e8e3e;
+      }
+      .submission-state.rejected {
+        color: red;
+      }
+      .submission-state.submitted {
+        color: #fbc02d;
+      }
+      #myDropzone.dropzone {
+        border-radius: 4px;
+        min-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="embed.js"></script>
+  </body>
+</html>

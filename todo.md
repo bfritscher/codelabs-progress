@@ -2,12 +2,12 @@
 [x] get jwt
 [x] get state from server
 [x] send assignment upload
-[ ] formatting
-[ ] get assignment name?
+[x] formatting
+[x] get assignment name via iframe embed search param
 
 
 [claat]
-[ ] inject script
+[x] inject script, iframe
 
 
 [server]
@@ -18,14 +18,14 @@
 
 [x] with admin
 [x] list all
-[ ] filter
-[ ] classlist %
+[x] filter
+[x] classlist %
 [x] validate reject or accept
 [x] delete submission
-[ ] delete all submissions
-[ ] group by assignment ids
-[ ] scroll to submissions
-[ ] filter submissions state
-[ ] dropdown select course
+[-] delete all submissions
+[x] group by assignment ids
+[x] scroll to submissions
+[x] filter submissions state
+[x] dropdown select course
 [ ] notification?
-
+[ ] submissions data filtered on server?

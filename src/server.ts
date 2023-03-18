@@ -54,7 +54,7 @@ app.post(
     res.send(
       `<script>
 if(window.opener) {
-  window.opener.postMessage('${req.body.jwt}');
+  window.opener.postMessage('${req.body.jwt}', '*');
   window.close();
 } else {
   localStorage.setItem('CODELABS_PROGRESS_JWT', '${req.body.jwt}');
@@ -136,6 +136,31 @@ app.delete(
       }
     }).then((submission) => {
       return submission.destroy();
+    })
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch((e) => {
+      console.log("upsert error", e);
+      res.sendStatus(500);
+    });
+  }
+);
+
+app.delete(
+  "/api/course",
+  ensureUser,
+  (req: express.Request, res: express.Response) => {
+    if (!req.user.isAdmin) {
+      res.json({});
+      return;
+    }
+    Course.findOne({
+      where: {
+        name: req.body.name,
+      }
+    }).then((course) => {
+      return course.destroy();
     })
     .then(() => {
       res.sendStatus(200);

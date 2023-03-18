@@ -1,20 +1,22 @@
 const currentScript = document.currentScript;
 (() => {
   const JWT_KEY = "CODELABS_PROGRESS_JWT";
-  const BASE_URL = "http://localhost:8080";
+  const BASE_URL = "https://codelabs.bf0.ch";
   let jwtToken = null;
   let canUpload = false;
 
   const mainDiv = document.createElement("div");
+  mainDiv.classList.add("codelabs-progress");
+
+  const assignmentDiv = document.createElement("div");
+  mainDiv.append(assignmentDiv);
+
   const loginButton = document.createElement("a");
   loginButton.innerText = "Login";
   loginButton.style.display = "none";
   loginButton.classList.add("btn-login");
   loginButton.addEventListener("click", login);
   mainDiv.append(loginButton);
-
-  const assignmentDiv = document.createElement("div");
-  mainDiv.append(assignmentDiv);
 
   const dropzoneDiv = document.createElement("div");
   dropzoneDiv.style.display = "none";
@@ -37,7 +39,8 @@ const currentScript = document.currentScript;
       url: "/",
       maxFiles: 1,
       acceptedFiles: "image/*",
-      dictDefaultMessage: "Drop files here to upload or CTRL + V"
+      dictDefaultMessage:
+        "Drop files here to upload, click to browse or CTRL + V to past from clipboard.",
     });
     dropzone.on("addedfile", function () {
       while (this.files.length > this.options.maxFiles)
@@ -70,6 +73,8 @@ const currentScript = document.currentScript;
     jwtToken = localStorage.getItem(JWT_KEY);
     if (!jwtToken) {
       loginButton.style.display = "inline-block";
+      assignmentDiv.innerHTML =
+        "<h2>Please login to send or see your submission</h2>";
     } else {
       getState();
     }
@@ -84,7 +89,7 @@ const currentScript = document.currentScript;
   }
 
   function getAssignment() {
-    return "todo";
+    return window.location.search.slice(1);
   }
 
   function getState() {
@@ -111,7 +116,14 @@ const currentScript = document.currentScript;
     loginButton.style.display = "none";
     if (submission) {
       // display
-      assignmentDiv.innerHTML = `<h4>Your submission is <span class="submission-state ${submission.state}">${submission.state}</span>:</h4><img style="max-width:100%;" src="${BASE_URL}/codelabs/${getAssignment()}/${submission.email}.jpg?${Math.random()}"/>`;
+      assignmentDiv.innerHTML = `<h2>Your submission is <span class="submission-state ${
+        submission.state
+      }">${submission.state}</span>:</h2>
+      <p style="text-align:center;"><img class="preview" src="${BASE_URL}/codelabs/${getAssignment()}/${
+        submission.email
+      }.jpg?${Math.random()}"/></p>`;
+    } else {
+      assignmentDiv.innerHTML = "<h2>Upload your image</h2>";
     }
     if (
       !submission ||
