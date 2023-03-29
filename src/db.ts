@@ -1,5 +1,5 @@
 import { SubmissionModelStatic, CourseModelStatic } from "db";
-import { DataTypes, Sequelize } from "sequelize";
+import { DataTypes, Sequelize, QueryTypes } from "sequelize";
 
 export const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -16,6 +16,7 @@ export const Submission = sequelize.define(
       allowNull: false,
       defaultValue: "submitted",
     },
+    message: { type: DataTypes.STRING, allowNull: true },
   },
   {
     timestamps: true,
@@ -33,9 +34,31 @@ export const Course = sequelize.define(
   }
 ) as CourseModelStatic;
 
+// hack to not use migrations as alter:true does not work
+async function addColumnToTable(tableName, columnName, type) {
+  // Check if the message column exists
+  const result = await sequelize.query(
+    `PRAGMA table_info(${tableName});`,
+    { type: QueryTypes.SELECT }
+  );
+
+  const messageColumnExists = result.some((column:any) => column.name === columnName);
+
+  if (!messageColumnExists) {
+    return await sequelize.query(
+      `ALTER TABLE ${tableName} ADD COLUMN message ${type};`,
+      { type: QueryTypes.RAW }
+    );
+  }
+}
+
+
 function ensureConnection(): Promise<any> {
   return new Promise((resolve, reject) => {
-    sequelize.sync().then(resolve, ensureConnection);
+    return sequelize.sync().then(async () => {
+      await addColumnToTable("submissions", "message", "TEXT");
+      resolve('ok');
+    }, ensureConnection);
   });
 }
 

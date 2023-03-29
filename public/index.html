@@ -16,7 +16,7 @@
   </head>
 
   <body>
-    <div id="app">
+    <div id="app" v-cloak>
       <header>
         <nav>
           <h1>Codelabs Progress Dashboard</h1>
@@ -59,7 +59,7 @@
         <table>
           <thead>
             <tr>
-              <th>Students</th>
+              <th class="col1-sticky">Students</th>
               <th>Totals</th>
               <th
                 v-for="a in selectedCourse.assignments"
@@ -71,7 +71,7 @@
           </thead>
           <tbody>
             <tr v-for="(s, sindex) in selectedCourse.students">
-              <td class="text-nowrap">{{ s }}</td>
+              <td class="text-nowrap col1-sticky">{{ s }}</td>
               <td><my-totals :value="studentsTotal[sindex]"></my-totals></td>
               <td v-for="a in selectedCourse.assignments">
                 <div
@@ -90,7 +90,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <th>{{ selectedCourse.students.length }}</th>
+              <th class="col1-sticky">{{ selectedCourse.students.length }}</th>
               <td></td>
               <th v-for="(a, aindex) in selectedCourse.assignments">
                 <my-totals :value="assignmentsTotal[aindex]"></my-totals>
@@ -127,7 +127,8 @@
                 {{s.email}}
               </td>
               <td>
-                <span v-if="s.state ==='submitted'">
+                <div v-if="s.state ==='submitted'">
+                <span>
                   <button
                     @click="changeState(s, 'accepted')"
                     class="bg-accepted btn-block my-1"
@@ -141,15 +142,20 @@
                     reject
                   </button>
                 </span>
-                <select
-                  v-else
-                  :value="s.state"
-                  @input="changeState(s, $event.target.value)"
-                >
-                  <option>submitted</option>
-                  <option>accepted</option>
-                  <option>rejected</option>
-                </select>
+                <textarea v-model="s.message" rows="6" cols="40"></textarea>
+                </div>
+                <div v-else>
+                  <select
+
+                    :value="s.state"
+                    @input="changeState(s, $event.target.value)"
+                  >
+                    <option>submitted</option>
+                    <option>accepted</option>
+                    <option>rejected</option>
+                  </select>
+                  <p v-html="nl2br(s.message)"></p>
+                </div>
                 <button @click="deleteSubmission(s)" class="btn-block my-1">
                   delete
                 </button>

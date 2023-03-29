@@ -1,5 +1,7 @@
 .env
 node_modules
+public/codelabs
+db
 dist
 .gitignore
 package-lock.json

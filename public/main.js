@@ -204,6 +204,8 @@ createApp({
           submission.assignment === selectedAssignment.value &&
           selectedCourse.value.students.includes(submission.email)
         );
+      }).sort((a, b) => {
+        return selectedCourse.value.students.findIndex((email) => email === a.email) - selectedCourse.value.students.findIndex((email) => email === b.email)
       });
     });
 
@@ -307,10 +309,13 @@ createApp({
           if (el) {
             el.scrollIntoView();
           }
-        }, 100);
+        }, 500);
       },
       zoom(element) {
         panzoom(element);
+      },
+      nl2br(str) {
+        return str && str.replace(/\n/g, "<br>") || str;
       }
     };
   },

@@ -3,10 +3,10 @@ import { Model, BuildOptions } from "sequelize";
 export interface SubmissionModel extends Model {
   assignment: string;
   email: string;
-  url: string;
-  check_date?: Date;
-  check_status?: string;
-  check_content?: string;
+  state: string;
+  message?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 type SubmissionModelStatic = typeof Model & {

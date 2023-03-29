@@ -112,6 +112,10 @@ const currentScript = document.currentScript;
       .then(renderSubmission);
   }
 
+  function nl2br(str) {
+    return str && str.replace(/\n/g, "<br>") || str;
+  }
+
   function renderSubmission(submission) {
     loginButton.style.display = "none";
     if (submission) {
@@ -119,6 +123,7 @@ const currentScript = document.currentScript;
       assignmentDiv.innerHTML = `<h2>Your submission is <span class="submission-state ${
         submission.state
       }">${submission.state}</span>:</h2>
+      <p>${nl2br(submission.message)}</p>
       <p style="text-align:center;"><img class="preview" src="${BASE_URL}/codelabs/${getAssignment()}/${
         submission.email
       }.jpg?${Math.random()}"/></p>`;
