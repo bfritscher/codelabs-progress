@@ -113,7 +113,7 @@ const currentScript = document.currentScript;
   }
 
   function nl2br(str) {
-    return str && str.replace(/\n/g, "<br>") || str;
+    return str && str.replace(/\n/g, "<br>") || str || "";
   }
 
   function renderSubmission(submission) {
