@@ -65,6 +65,10 @@ tbody td {
     padding: 0 8px;
 }
 
+td > div {
+    text-align: center;
+}
+
 .correct,
 .correct a,
 .accepted {
