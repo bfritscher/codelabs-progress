@@ -42,7 +42,8 @@ table {
     border-collapse: collapse;
 }
 
-tbody tr:hover {
+tbody tr:hover,
+tbody tr:hover td {
     background-color: #ffffcc;
 }
 
