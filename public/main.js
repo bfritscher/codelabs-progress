@@ -5,6 +5,8 @@ import {
   computed,
 } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 
+const BASE_URL = '';
+
 const myTotals = defineComponent({
   props: ["value"],
   setup(props) {
@@ -66,7 +68,7 @@ createApp({
     }
 
     function getSubmissions() {
-      fetch("/api/submissions", {
+      fetch(`${BASE_URL}/api/submissions`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -86,7 +88,7 @@ createApp({
     }
 
     function getCourses() {
-      return fetch("/api/courses", {
+      return fetch(`${BASE_URL}/api/courses`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -111,7 +113,7 @@ createApp({
     init();
 
     function changeCourse(course) {
-      fetch(`/api/course`, {
+      fetch(`${BASE_URL}/api/course`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -222,7 +224,7 @@ createApp({
       studentsTotal,
       assignmentsTotal,
       changeState(submission, state) {
-        fetch(`/api/submission`, {
+        fetch(`${BASE_URL}/api/submission`, {
           method: "PATCH",
           headers: {
             Accept: "application/json",
@@ -241,7 +243,7 @@ createApp({
       deleteSubmission(submission) {
         if (!confirm("Are you sure you want to delete this submission?"))
           return;
-        fetch(`/api/submission`, {
+        fetch(`${BASE_URL}/api/submission`, {
           method: "DELETE",
           headers: {
             Accept: "application/json",
@@ -287,7 +289,7 @@ createApp({
       deleteCourse() {
         const course = selectedCourse.value;
         if (!confirm("Are you sure you want to delete this course?")) return;
-        fetch(`/api/course`, {
+        fetch(`${BASE_URL}/api/course`, {
           method: "DELETE",
           headers: {
             Accept: "application/json",
