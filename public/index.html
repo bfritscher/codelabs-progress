@@ -63,9 +63,8 @@
               <th>Totals</th>
               <th
                 v-for="a in selectedCourse.assignments"
-                @click="selectedAssignment === a ? selectedAssignment = null : selectedAssignment = a"
               >
-                {{ a }}
+                <a :href="`https://learn.fritscher.ch/codelabs/${a}`" target="_blank">{{ a }}</a>
               </th>
             </tr>
           </thead>
@@ -82,7 +81,7 @@
                     :class="submissionsIndex[a][s].state"
                     :title="`CreatedAt: ${submissionsIndex[a][s].createdAt}\nUpdatedAt: ${submissionsIndex[a][s].updatedAt}`"
                   >
-                    {{ submissionsIndex[a][s].state }}
+                    {{ stateToEmoji[submissionsIndex[a][s].state] }}
                   </span>
                 </div>
               </td>
@@ -92,7 +91,8 @@
             <tr>
               <th class="col1-sticky">{{ selectedCourse.students.length }}</th>
               <td></td>
-              <th v-for="(a, aindex) in selectedCourse.assignments">
+              <th v-for="(a, aindex) in selectedCourse.assignments"
+                @click="selectedAssignment === a ? selectedAssignment = null : selectedAssignment = a">
                 <my-totals :value="assignmentsTotal[aindex]"></my-totals>
               </th>
             </tr>

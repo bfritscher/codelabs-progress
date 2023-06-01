@@ -212,6 +212,11 @@ createApp({
     });
 
     return {
+      stateToEmoji: {
+        submitted: "📩",
+        accepted: "✅",
+        rejected: "❌"
+      },
       courseEdit,
       showCourseEdit,
       selectedCourse,

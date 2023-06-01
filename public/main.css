@@ -55,7 +55,7 @@ th {
     cursor: pointer;
 }
 
-th:hover {
+th:hover, th:hover a {
     background-color: #509ee3;
     color: white;
 }
