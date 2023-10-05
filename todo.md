@@ -1,11 +1,11 @@
  # next
 
-[ ] submissions data filtered on server?
-[ ] submissions limited to current user if not admin
-[ ] courses limited to current user if not admin and filter user_emails
-[ ] frontend works with non admin-user
+[x] submissions data filtered on server?
+[x] submissions limited to current user if not admin
+[x] courses limited to current user if not admin and filter user_emails
+[x] frontend works with non admin-user
 [x] frontend save selected courses in localStorage
-
+[ ] delete all submissions for an email
 
 [component]
 [x] get jwt
@@ -31,7 +31,6 @@
 [x] classlist %
 [x] validate reject or accept
 [x] delete submission
-[-] delete all submissions
 [x] group by assignment ids
 [x] scroll to submissions
 [x] filter submissions state

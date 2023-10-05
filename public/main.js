@@ -58,7 +58,6 @@ createApp({
       if (!jwt) {
         login();
       } else {
-        getSubmissions();
         getCourses();
       }
     }
@@ -68,8 +67,8 @@ createApp({
       window.location = `https://marmix.ig.he-arc.ch/shibjwt/?reply_to=${location.origin}/api/login`;
     }
 
-    function getSubmissions() {
-      fetch(`${BASE_URL}/api/submissions`, {
+    function getSubmissions(courseName) {
+      fetch(`${BASE_URL}/api/submissions/${courseName}`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -107,11 +106,7 @@ createApp({
           courses.value = data;
           if (data.length > 0) {
             const courseName = localStorage.getItem(SELECTED_COURSE_KEY);
-            if (courseName) {
-              selectedCourse.value = data.find((c) => c.name === courseName);
-            } else {
-              selectedCourse.value = data[0];
-            }
+            handleCourseSelect(courseName || data[0].name);
           }
         });
     }
@@ -133,9 +128,7 @@ createApp({
         })
         .then(async (newCourse) => {
           await getCourses();
-          selectedCourse.value = courses.value.find(
-            (c) => c.name === newCourse.name
-          );
+          handleCourseSelect(newCourse.name);
         });
     }
 
@@ -217,6 +210,20 @@ createApp({
       });
     });
 
+    function handleCourseSelect(name) {
+      selectedAssignment.value = null;
+      if (name === "add_new") {
+        courseEdit.value.name = prompt("Course name");
+        courseEdit.value.assignments = "";
+        courseEdit.value.students = "";
+        showCourseEdit.value = true;
+      } else {
+        localStorage.setItem(SELECTED_COURSE_KEY, name);
+        selectedCourse.value = courses.value.find((c) => c.name === name);
+        getSubmissions(name);
+      }
+    }
+
     return {
       stateToEmoji: {
         submitted: "📩",
@@ -234,6 +241,7 @@ createApp({
       submissionsIndex,
       studentsTotal,
       assignmentsTotal,
+      handleCourseSelect,
       changeState(submission, state) {
         fetch(`${BASE_URL}/api/submission`, {
           method: "PATCH",
@@ -285,19 +293,6 @@ createApp({
         courseEdit.value.assignments = course.assignments.join("\n");
         courseEdit.value.students = course.students.join("\n");
         showCourseEdit.value = true;
-      },
-      handleCourseSelect(name) {
-        selectedAssignment.value = null;
-        if (name === "add_new") {
-          courseEdit.value.name = prompt("Course name");
-          courseEdit.value.assignments = "";
-          courseEdit.value.students = "";
-          showCourseEdit.value = true;
-        } else {
-          // TODO get submissions for course
-          localStorage.setItem(SELECTED_COURSE_KEY, name);
-          selectedCourse.value = courses.value.find((c) => c.name === name);
-        }
       },
       deleteCourse() {
         const course = selectedCourse.value;

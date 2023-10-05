@@ -3,6 +3,10 @@ import express from "express";
 import cors from "cors";
 import fs from "fs-extra";
 import multer from "multer";
+import Sequelize from "sequelize";
+
+const Op = Sequelize.Op;
+
 const storage = multer.diskStorage({
   async destination(req, file, cb) {
     const dir = `/app/public/codelabs/${req.query.assignment}`
@@ -85,22 +89,32 @@ app.get(
 
 
 app.get(
-  "/api/submissions",
+  "/api/submissions/:courseName",
   ensureUser,
   (req: express.Request, res: express.Response) => {
-    if (!req.user.isAdmin) {
-      res.json([]);
-      return;
-    }
-    const query: any = {
-      where: {}
-    };
-    Submission.findAll(query).then(submissions => {
-      res.json(submissions);
-    }, (e) => {
-      console.log("query error", e);
-      res.sendStatus(500);
-    });
+    // only get submissions for students in course
+    Course.findOne({
+      where: {
+        name: req.params.courseName,
+      }
+    }).then((course) => {
+      console.log("students", course.students);
+      const query: any = {
+        where: {
+          email: course.students,
+        }
+      };
+      // limit to own submissions
+      if (!req.user.isAdmin) {
+        query.where.email = req.user.email;
+      }      
+      Submission.findAll(query).then(submissions => {
+        res.json(submissions);
+      }, (e) => {
+        console.log("query error", e);
+        res.sendStatus(500);
+      });
+    })
   }
 );
 
@@ -195,21 +209,29 @@ app.get(
   "/api/courses",
   ensureUser,
   (req: express.Request, res: express.Response) => {
-    if (!req.user.isAdmin) {
-      res.json([]);
-      return;
-    }
     const query: any = {
       where: {}
     };
-    Course.findAll(query).then(course => {
-      res.json(course);
+    if (!req.user.isAdmin) {
+      // limit to student's courses
+      query.where.students = { [Op.like]: [`%${req.user.email}%`] }; 
+    }    
+    Course.findAll(query).then(courses => {
+      if (!req.user.isAdmin) {
+        // filter other students
+        courses = courses.map(course => {
+          course.students = course.students.filter((student) => student === req.user.email);
+          return course
+        });
+      }
+      res.json(courses);
     }, (e) => {
       console.log("query error", e);
       res.sendStatus(500);
     });
   }
 );
+
 
 app.post(
   "/api/course",
