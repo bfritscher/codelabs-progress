@@ -30,6 +30,7 @@ createApp({
   },
   setup() {
     const JWT_KEY = "CODELABS_PROGRESS_JWT";
+    const SELECTED_COURSE_KEY = "CODELABS_SELECTED_COURSE";
     const jwt = localStorage.getItem(JWT_KEY);
 
     const submissions = ref([]);
@@ -105,7 +106,12 @@ createApp({
         .then((data) => {
           courses.value = data;
           if (data.length > 0) {
-            selectedCourse.value = data[0];
+            const courseName = localStorage.getItem(SELECTED_COURSE_KEY);
+            if (courseName) {
+              selectedCourse.value = data.find((c) => c.name === courseName);
+            } else {
+              selectedCourse.value = data[0];
+            }
           }
         });
     }
@@ -288,6 +294,8 @@ createApp({
           courseEdit.value.students = "";
           showCourseEdit.value = true;
         } else {
+          // TODO get submissions for course
+          localStorage.setItem(SELECTED_COURSE_KEY, name);
           selectedCourse.value = courses.value.find((c) => c.name === name);
         }
       },
