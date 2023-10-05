@@ -1,7 +1,7 @@
 const currentScript = document.currentScript;
 (() => {
   const JWT_KEY = "CODELABS_PROGRESS_JWT";
-  const BASE_URL = "";
+  const BASE_URL = "https://codelabs.bf0.ch";
   let jwtToken = null;
   let canUpload = false;
 
