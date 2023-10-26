@@ -6,6 +6,7 @@ import {
 } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 
 const BASE_URL = '';
+const UPDATE_INTERVAL = 5000;
 
 const myTotals = defineComponent({
   props: ["value"],
@@ -54,6 +55,10 @@ createApp({
 
     const filterState = ref("");
 
+    const lastUpdated = ref();
+
+    let activeTimeout = undefined;
+
     function init() {
       if (!jwt) {
         login();
@@ -68,6 +73,12 @@ createApp({
     }
 
     function getSubmissions(courseName) {
+      if (activeTimeout) {
+        clearTimeout(activeTimeout);
+      }
+      setTimeout(() => {
+        getSubmissions(courseName);
+      }, UPDATE_INTERVAL);
       fetch(`${BASE_URL}/api/submissions/${courseName}`, {
         method: "GET",
         headers: {
@@ -84,6 +95,7 @@ createApp({
         })
         .then((data) => {
           submissions.value = data;
+          lastUpdated.value = new Date().toLocaleDateString('fr-CH') + " " + new Date().toLocaleTimeString('fr-CH');
         });
     }
 
@@ -230,6 +242,7 @@ createApp({
         accepted: "✅",
         rejected: "❌"
       },
+      lastUpdated,
       courseEdit,
       showCourseEdit,
       selectedCourse,

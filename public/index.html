@@ -34,6 +34,8 @@
           <option value="add_new">add new</option>
         </select>
         <button @click="editCourse(selectedCourse)" class="btn-sm">Edit</button>
+        <span class="spacer"></span>
+        <span>{{lastUpdated}}</span>
       </div>
       <div class="box" v-if="showCourseEdit">
         <h2>{{courseEdit.name}}</h2>
