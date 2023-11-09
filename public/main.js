@@ -5,7 +5,7 @@ import {
   computed,
 } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
 
-const BASE_URL = '';
+const BASE_URL = 'https://codelabs.bf0.ch';
 const UPDATE_INTERVAL = 5000;
 
 const myTotals = defineComponent({
@@ -94,7 +94,16 @@ createApp({
           return res.json();
         })
         .then((data) => {
-          submissions.value = data;
+          for(const submission of data) {
+            const s = submissions.value.find((s) => s.assignment === submission.assignment && s.email === submission.email);
+            if (s) {
+              Object.assign(s, submission);
+            } else {
+              submission.editedMessage = submission.message;
+              submissions.value.push(submission);
+            }
+          }
+          
           lastUpdated.value = new Date().toLocaleDateString('fr-CH') + " " + new Date().toLocaleTimeString('fr-CH');
         });
     }
@@ -237,6 +246,7 @@ createApp({
     }
 
     return {
+      BASE_URL,
       stateToEmoji: {
         submitted: "📩",
         accepted: "✅",
@@ -256,6 +266,7 @@ createApp({
       assignmentsTotal,
       handleCourseSelect,
       changeState(submission, state) {
+        submission.message = submission.editedMessage;
         fetch(`${BASE_URL}/api/submission`, {
           method: "PATCH",
           headers: {

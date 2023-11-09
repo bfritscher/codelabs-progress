@@ -144,7 +144,7 @@
                     reject
                   </button>
                 </span>
-                <textarea v-model="s.message" rows="6" cols="40"></textarea>
+                <textarea v-model="s.editedMessage" rows="6" cols="40"></textarea>
                 </div>
                 <div v-else>
                   <select
@@ -164,7 +164,7 @@
               </td>
               <td>
                 <img
-                  :src="`/codelabs/${s.assignment}/${s.email}.jpg`"
+                  :src="`${BASE_URL}/codelabs/${s.assignment}/${s.email}.jpg`"
                   @click="zoom($event.target)"
                 />
               </td>
