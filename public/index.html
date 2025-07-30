@@ -65,8 +65,14 @@
               <th>Totals</th>
               <th
                 v-for="a in selectedCourse.assignments"
+                :class="{ 'separator-column': a === SEPARATOR_ASSIGNMENT }"
               >
-                <a :href="`https://learn.fritscher.ch/codelabs/${a}`" target="_blank">{{ a }}</a>
+                <template v-if="a === SEPARATOR_ASSIGNMENT">
+                  <div class="separator-line"></div>
+                </template>
+                <template v-else>
+                  <a :href="`https://learn.fritscher.ch/codelabs/${a}`" target="_blank">{{ a }}</a>
+                </template>
               </th>
             </tr>
           </thead>
@@ -74,18 +80,23 @@
             <tr v-for="(s, sindex) in selectedCourse.students">
               <td class="text-nowrap col1-sticky">{{ s }}</td>
               <td><my-totals :value="studentsTotal[sindex]"></my-totals></td>
-              <td v-for="a in selectedCourse.assignments">
-                <div
-                  v-if="submissionsIndex[a] && submissionsIndex[a][s]"
-                  @click="scrollTo(a, s)"
-                >
-                  <span
-                    :class="submissionsIndex[a][s].state"
-                    :title="`CreatedAt: ${submissionsIndex[a][s].createdAt}\nUpdatedAt: ${submissionsIndex[a][s].updatedAt}`"
+              <td v-for="a in selectedCourse.assignments" :class="{ 'separator-column': a === SEPARATOR_ASSIGNMENT }">
+                <template v-if="a === SEPARATOR_ASSIGNMENT">
+                  <div class="separator-line"></div>
+                </template>
+                <template v-else>
+                  <div
+                    v-if="submissionsIndex[a] && submissionsIndex[a][s]"
+                    @click="scrollTo(a, s)"
                   >
-                    {{ stateToEmoji[submissionsIndex[a][s].state] }}
-                  </span>
-                </div>
+                    <span
+                      :class="submissionsIndex[a][s].state"
+                      :title="`CreatedAt: ${submissionsIndex[a][s].createdAt}\nUpdatedAt: ${submissionsIndex[a][s].updatedAt}`"
+                    >
+                      {{ stateToEmoji[submissionsIndex[a][s].state] }}
+                    </span>
+                  </div>
+                </template>
               </td>
             </tr>
           </tbody>
@@ -94,8 +105,14 @@
               <th class="col1-sticky">{{ selectedCourse.students.length }}</th>
               <td></td>
               <th v-for="(a, aindex) in selectedCourse.assignments"
-                @click="selectedAssignment === a ? selectedAssignment = null : selectedAssignment = a">
-                <my-totals :value="assignmentsTotal[aindex]"></my-totals>
+                :class="{ 'separator-column': a === SEPARATOR_ASSIGNMENT }"
+                @click="a !== SEPARATOR_ASSIGNMENT && (selectedAssignment === a ? selectedAssignment = null : selectedAssignment = a)">
+                <template v-if="a === SEPARATOR_ASSIGNMENT">
+                  <div class="separator-line"></div>
+                </template>
+                <template v-else>
+                  <my-totals :value="assignmentsTotal[aindex]"></my-totals>
+                </template>
               </th>
             </tr>
           </tfoot>

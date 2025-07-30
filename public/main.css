@@ -185,3 +185,25 @@ button,
     z-index: 1;
     background-color: white;
 }
+
+.separator-column {
+    background-color: #f8f9fa !important;
+    width: 20px;
+    min-width: 20px;
+    max-width: 20px;
+    padding: 0 !important;
+    cursor: default !important;
+}
+
+.separator-column:hover {
+    background-color: #f8f9fa !important;
+    color: inherit !important;
+}
+
+.separator-line {
+    width: 2px;
+    height: 100%;
+    background-color: #dee2e6;
+    margin: 0 auto;
+    min-height: 20px;
+}

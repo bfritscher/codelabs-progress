@@ -7,6 +7,7 @@ import {
 
 const BASE_URL = 'https://codelabs.bf0.ch';
 const UPDATE_INTERVAL = 5000;
+const SEPARATOR_ASSIGNMENT = "---";
 
 const myTotals = defineComponent({
   props: ["value"],
@@ -171,6 +172,9 @@ createApp({
       return selectedCourse.value.students.map((email) => {
         return selectedCourse.value.assignments.reduce(
           (totals, assignment) => {
+            if (assignment === SEPARATOR_ASSIGNMENT) {
+              return totals;
+            }
             totals.total += 1;
             if (
               submissionsIndex.value[assignment] &&
@@ -195,6 +199,15 @@ createApp({
 
     const assignmentsTotal = computed(() => {
       return selectedCourse.value.assignments.map((assignment) => {
+        if (assignment === SEPARATOR_ASSIGNMENT) {
+          return {
+            total: 0,
+            absent: 0,
+            submitted: 0,
+            accepted: 0,
+            rejected: 0,
+          };
+        }
         return selectedCourse.value.students.reduce(
           (totals, email) => {
             totals.total += 1;
@@ -247,6 +260,7 @@ createApp({
 
     return {
       BASE_URL,
+      SEPARATOR_ASSIGNMENT,
       stateToEmoji: {
         submitted: "📩",
         accepted: "✅",
