@@ -49,6 +49,60 @@ const currentScript = document.currentScript;
     dropzone.on("success", function (file, response) {
       renderSubmission(response);
     });
+    dropzone.on("error", function (file, errorMessage, xhr) {
+      // Handle upload errors
+      console.error("Upload error:", errorMessage, xhr);
+      
+      // Check if it's a token expiration error (401 or 403)
+      if (xhr && (xhr.status === 401 || xhr.status === 403)) {
+        // Token expired, trigger re-login
+        localStorage.removeItem(JWT_KEY);
+        jwtToken = null;
+        canUpload = false;
+        assignmentDiv.innerHTML = "<h2>Session expired. Please login again to upload.</h2>";
+        loginButton.style.display = "inline-block";
+        dropzoneDiv.style.display = "none";
+      } else {
+        // Other upload errors
+        let errorText = "Upload failed. Please try again.";
+        if (typeof errorMessage === "string") {
+          errorText = errorMessage;
+        } else if (xhr && xhr.responseText) {
+          try {
+            const errorResponse = JSON.parse(xhr.responseText);
+            errorText = errorResponse.message || errorResponse.error || errorText;
+          } catch (e) {
+            errorText = xhr.responseText || errorText;
+          }
+        }
+        
+        // Display error message to user
+        const errorDiv = document.createElement("div");
+        errorDiv.classList.add("upload-error");
+        errorDiv.style.color = "red";
+        errorDiv.style.marginTop = "10px";
+        errorDiv.innerHTML = `<strong>Error:</strong> ${errorText}`;
+        
+        // Remove any existing error messages
+        const existingError = mainDiv.querySelector(".upload-error");
+        if (existingError) {
+          existingError.remove();
+        }
+        
+        // Add new error message
+        dropzoneDiv.after(errorDiv);
+        
+        // Auto-remove error message after 5 seconds
+        setTimeout(() => {
+          if (errorDiv && errorDiv.parentNode) {
+            errorDiv.remove();
+          }
+        }, 5000);
+      }
+      
+      // Remove the failed file from dropzone
+      this.removeFile(file);
+    });
     document.onpaste = function (event) {
       const items = (event.clipboardData || event.originalEvent.clipboardData)
         .items;
@@ -102,14 +156,26 @@ const currentScript = document.currentScript;
       },
     })
       .then((res) => {
-        if (res.status === 403) {
+        if (res.status === 401 || res.status === 403) {
           localStorage.removeItem(JWT_KEY);
-          init();
+          jwtToken = null;
+          canUpload = false;
+          loginButton.style.display = "inline-block";
+          assignmentDiv.innerHTML = "<h2>Session expired. Please login to see your submission</h2>";
           throw new Error("Invalid token");
+        }
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
         return res.json();
       })
-      .then(renderSubmission);
+      .then(renderSubmission)
+      .catch((error) => {
+        console.error("Error fetching submission state:", error);
+        if (error.message !== "Invalid token") {
+          assignmentDiv.innerHTML = "<h2>Error loading submission. Please try refreshing the page.</h2>";
+        }
+      });
   }
 
   function nl2br(str) {
