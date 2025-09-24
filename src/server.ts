@@ -98,6 +98,12 @@ app.get(
         name: req.params.courseName,
       }
     }).then((course) => {
+      if (!course) {
+        console.log("Course not found:", req.params.courseName);
+        res.status(404).json({ error: "Course not found" });
+        return;
+      }
+      
       console.log("students", course.students);
       const query: any = {
         where: {
@@ -114,7 +120,10 @@ app.get(
         console.log("query error", e);
         res.sendStatus(500);
       });
-    })
+    }).catch((e) => {
+      console.log("course lookup error", e);
+      res.sendStatus(500);
+    });
   }
 );
 

@@ -77,7 +77,7 @@ createApp({
       if (activeTimeout) {
         clearTimeout(activeTimeout);
       }
-      setTimeout(() => {
+      activeTimeout = setTimeout(() => {
         getSubmissions(courseName);
       }, UPDATE_INTERVAL);
       fetch(`${BASE_URL}/api/submissions/${courseName}`, {
