@@ -1,3 +1,10 @@
+ # TODO
+ [x] fix upload error handling if jwt expired
+ [x] fix on reupload image cache requiring page refresh
+ [x] handle space to split bonus assignments ?
+ [ ] e-mail notification? push notification?
+
+ 
  # next
 
 [x] submissions data filtered on server?
